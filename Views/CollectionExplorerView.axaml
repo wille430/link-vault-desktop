@@ -1,0 +1,49 @@
+<UserControl
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        d:DesignWidth="800"
+        d:DesignHeight="450"
+        x:Class="LinkVault.Views.CollectionExplorerView">
+    <DockPanel>
+
+        <Border
+                Margin="20"
+                DockPanel.Dock="Top">
+            <TextBox
+                    Text="{Binding SearchText, Mode=TwoWay}"
+                    Watermark="Search..."></TextBox>
+        </Border>
+
+        <Grid
+                ColumnDefinitions="*"
+                RowDefinitions="1*, auto">
+            <ListBox
+                    x:Name="ListBox"
+                    Items="{Binding LinkCollections}"
+                    DockPanel.Dock="Top"
+                    Grid.Row="0"
+                    SelectedItem="{Binding SelectedCollection}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock
+                                x:Name="TextBlock"
+                                Text="{Binding Name}"></TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <StackPanel
+                    Grid.Row="1"
+                    Name="BottomBar"
+                    Orientation="Horizontal">
+                <Button
+                        Command="{Binding $parent[Window].DataContext.CreateCollection}"
+                        Content="+ Create Collection"
+                        Width="{Binding #BottomBar.Bounds.Width}" />
+            </StackPanel>
+        </Grid>
+    </DockPanel>
+</UserControl>
