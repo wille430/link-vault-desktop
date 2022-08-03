@@ -18,7 +18,13 @@ namespace LinkVault.ViewModels
         public LinkCollection? LinkCollection { get; set; }
 
         [Reactive]
+        public bool HasCollection { get; set; }
+
+        [Reactive]
         public ObservableCollection<Link> Links { get; set; }
+
+        [Reactive]
+        public Link? SelectedLink { get; set; }
 
         public CollectionStore CollectionStore;
 
@@ -38,6 +44,16 @@ namespace LinkVault.ViewModels
                 else
                     Links = new();
             });
+
+            this.WhenAnyValue(x => x.LinkCollection).Subscribe(x =>
+            {
+                this.HasCollection = x is not null;
+            });
+
+            this.WhenAnyValue(x => x.SelectedLink).Subscribe(link =>
+            {
+                LinkStore.ShowLinkCreation(link);
+            });
         }
 
         public CollectionViewModel(AppDbContext context, CollectionStore collectionStore, LinkStore linkStore)
@@ -48,6 +64,7 @@ namespace LinkVault.ViewModels
 
             CollectionStore.CollectionSelected += OnCollectionSelected;
             LinkStore.LinkCreated += OnLinkCreated;
+            LinkStore.LinkUpdated += OnLinkUpdated;
         }
 
         private void OnCollectionSelected(LinkCollection? linkCollection)
@@ -66,6 +83,34 @@ namespace LinkVault.ViewModels
             {
                 LinkCollection = link.Collection ?? Context.Collections.Find(link.CollectionId);
             }
+
+            LinkStore.HideLinkCreation();
+        }
+
+        private void OnLinkUpdated(Link link)
+        {
+            if (link.CollectionId == LinkCollection?.Id)
+            {
+                var index = Links.ToList().FindIndex(0, Links.Count, x => x.Id == link.Id);
+
+                if (index >= 0)
+                {
+                    LinkCollection?.Links.RemoveAt(index);
+                    LinkCollection?.Links.Insert(index, link);
+
+                    Links.RemoveAt(index);
+                    Links.Insert(index, link);
+                }
+                else
+                {
+                    OnLinkCreated(link);
+                }
+            }
+            else
+            {
+                LinkCollection = link.Collection ?? Context.Collections.Find(link.CollectionId);
+            }
+            LinkStore.HideLinkCreation();
         }
 
         private void AddLink()

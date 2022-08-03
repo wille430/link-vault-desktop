@@ -29,32 +29,45 @@
         </ExperimentalAcrylicBorder>
 
         <Grid>
+
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="5*" />
                 <ColumnDefinition
-                        Width="2*"
-                        MaxWidth="350" />
-                <ColumnDefinition
-                        Width="5*"
-                        MinWidth="400" />
-                <ColumnDefinition Width="3*" />
+                        Width="3*"
+                        MinWidth="400"
+                        MaxWidth="600" />
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0">
-                <ContentControl>
-                    <vm:CollectionExplorerViewModel />
-                </ContentControl>
-            </Border>
+            <Grid
+                    Grid.Column="0"
+                    Grid.ColumnSpan="{Binding ColumnSpan}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="300" />
+                    <ColumnDefinition
+                            Width="5*"
+                            MinWidth="400" />
+                    <ColumnDefinition Width="3*" />
+                </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="1">
-                <ContentControl>
-                    <vm:CollectionViewModel />
-                </ContentControl>
-            </Border>
+                <Border Grid.Column="0">
+                    <ContentControl>
+                        <vm:CollectionExplorerViewModel />
+                    </ContentControl>
+                </Border>
 
-            <Border Grid.Column="2">
-                <ContentControl>
-                    <vm:CreateLinkViewModel />
-                </ContentControl>
+                <Border
+                        Grid.Column="1"
+                        Grid.ColumnSpan="2">
+                    <ContentControl>
+                        <vm:CollectionViewModel />
+                    </ContentControl>
+                </Border>
+            </Grid>
+
+            <Border
+                    IsVisible="{Binding CreateLinkViewModel, Converter={x:Static ObjectConverters.IsNotNull}}"
+                    Grid.Column="1">
+                <ContentControl Content="{Binding CreateLinkViewModel}" />
             </Border>
         </Grid>
     </Panel>

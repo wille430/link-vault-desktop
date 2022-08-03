@@ -7,13 +7,20 @@
         d:DesignWidth="800"
         d:DesignHeight="450"
         x:Class="LinkVault.Views.CollectionView">
-    <DockPanel>
+    <Grid
+            ColumnDefinitions="*"
+            RowDefinitions="auto, 1*">
         <TextBlock
-                DockPanel.Dock="Top"
+                Padding="16, 16, 16, 16"
+                Grid.Row="0"
                 Text="{Binding LinkCollection.Name}"></TextBlock>
 
-        <StackPanel>
-            <ListBox Items="{Binding Links}">
+        <StackPanel
+                Grid.Row="1"
+                IsVisible="{Binding HasCollection}">
+            <ListBox
+                    Items="{Binding Links}"
+                    SelectedItem="{Binding SelectedLink}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding URL}"></TextBlock>
@@ -23,5 +30,12 @@
 
             <Button Command="{Binding AddLink}">+ Add link</Button>
         </StackPanel>
-    </DockPanel>
+
+        <Panel
+                Grid.Row="1"
+                IsVisible="{Binding !HasCollection}"
+                VerticalAlignment="Center">
+            <TextBlock TextAlignment="Center">No collection selected. Please select a collection from the explorer view or create one.</TextBlock>
+        </Panel>
+    </Grid>
 </UserControl>

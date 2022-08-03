@@ -13,10 +13,6 @@ namespace LinkVault.ViewModels
 {
     public class CreateLinkViewModel : ViewModelBase
     {
-
-        [Reactive]
-        public bool IsVisible { get; set; } = false;
-
         [Reactive]
         public string? Title { get; set; }
         [Reactive]
@@ -35,6 +31,12 @@ namespace LinkVault.ViewModels
         public AppDbContext Context;
 
         public LinkStore LinkStore;
+
+        [Reactive]
+        public string Heading { get; set; }
+
+        [Reactive]
+        public Link SelectedLink { get; set; }
 
         public CreateLinkViewModel()
             : this(
@@ -55,6 +57,7 @@ namespace LinkVault.ViewModels
 
             CreateLinkCommand = ReactiveCommand.Create(() => new Link
             {
+                Id = SelectedLink?.Id,
                 Title = Title!,
                 URL = URL!,
                 Description = Description!,
@@ -74,6 +77,28 @@ namespace LinkVault.ViewModels
             {
                 LinkStore.HideLinkCreation();
             });
+
+            this.WhenAnyValue(x => x.SelectedLink).Subscribe(link =>
+            {
+                if (link is null)
+                {
+                    Heading = "Create Link";
+
+                    Title = "";
+                    URL = "";
+                    Description = "";
+                    Collection = null;
+                }
+                else
+                {
+                    Heading = $"Update {link.Title}";
+
+                    Title = link.Title;
+                    URL = link.URL;
+                    Description = link.Description;
+                    Collection = link.Collection;
+                }
+            });
         }
 
         public CreateLinkViewModel(AppDbContext context, LinkStore linkStore)
@@ -81,12 +106,6 @@ namespace LinkVault.ViewModels
             Context = context;
             LinkStore = linkStore;
 
-            LinkStore.LinkCreationVisible += OnLinkCreationVisible;
-        }
-
-        private void OnLinkCreationVisible(bool isVisible)
-        {
-            IsVisible = isVisible;
         }
 
         public void LoadCollections()

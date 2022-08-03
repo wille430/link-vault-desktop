@@ -7,54 +7,46 @@
         d:DesignWidth="800"
         d:DesignHeight="450"
         x:Class="LinkVault.Views.CreateLinkView">
-    <Panel>
-        <ExperimentalAcrylicBorder IsHitTestVisible="False">
-            <ExperimentalAcrylicBorder.Material>
-                <ExperimentalAcrylicMaterial
-                        BackgroundSource="Digger"
-                        TintColor="Black"
-                        TintOpacity="1"
-                        MaterialOpacity="0.65" />
-            </ExperimentalAcrylicBorder.Material>
-        </ExperimentalAcrylicBorder>
+    <DockPanel Margin="40">
+        <StackPanel
+                DockPanel.Dock="Top"
+                Margin="0,0,0,16">
+            <TextBlock Text="{Binding Heading}" />
+        </StackPanel>
+        <StackPanel Spacing="8">
+            <TextBlock>Title</TextBlock>
+            <TextBox Text="{Binding Title}"></TextBox>
 
-        <DockPanel
-                IsVisible="{Binding IsVisible}"
-                Margin="40">
+            <TextBlock>URL</TextBlock>
+            <TextBox Text="{Binding URL}"></TextBox>
+
+            <TextBlock>Description</TextBlock>
+            <TextBox Text="{Binding Description}"></TextBox>
+
+            <TextBlock>Collection</TextBlock>
+            <ComboBox
+                    Items="{Binding LinkCollections}"
+                    SelectedItem="{Binding Collection}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}"></TextBlock>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
             <StackPanel
-                    DockPanel.Dock="Top"
-                    Margin="0,0,0,16">
-                <TextBlock>Create Collection</TextBlock>
+                    Orientation="Horizontal"
+                    Spacing="8">
+                <Button
+                        Command="{Binding CreateLinkCommand}"
+                        IsVisible="{Binding SelectedLink, Converter={x:Static ObjectConverters.IsNull}}">Add</Button>
+
+                <Button
+                        Command="{Binding CreateLinkCommand}"
+                        IsVisible="{Binding SelectedLink, Converter={x:Static ObjectConverters.IsNotNull}}">Update</Button>
+
+                <Button Command="{Binding Cancel}">Cancel</Button>
             </StackPanel>
-            <StackPanel Spacing="8">
-                <TextBlock>Title</TextBlock>
-                <TextBox Text="{Binding Title}"></TextBox>
-
-                <TextBlock>URL</TextBlock>
-                <TextBox Text="{Binding URL}"></TextBox>
-
-                <TextBlock>Description</TextBlock>
-                <TextBox Text="{Binding Description}"></TextBox>
-
-                <TextBlock>Collection</TextBlock>
-                <ComboBox
-                        Items="{Binding LinkCollections}"
-                        SelectedItem="{Binding Collection}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Name}"></TextBlock>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-
-
-                <StackPanel
-                        Orientation="Horizontal"
-                        Spacing="8">
-                    <Button Command="{Binding CreateLinkCommand}">Add</Button>
-                    <Button Command="{Binding Cancel}">Cancel</Button>
-                </StackPanel>
-            </StackPanel>
-        </DockPanel>
-    </Panel>
+        </StackPanel>
+    </DockPanel>
 </UserControl>

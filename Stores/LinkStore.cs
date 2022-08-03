@@ -22,22 +22,44 @@ namespace LinkVault.Stores
             Context = context;
         }
 
-        public event Action<bool> LinkCreationVisible;
-        public void ShowLinkCreation()
+        public event Action<bool, Link?> LinkCreationVisible;
+        public void ShowLinkCreation(Link? link = null)
         {
-            LinkCreationVisible?.Invoke(true);
+            LinkCreationVisible?.Invoke(true, link);
         }
 
         public void HideLinkCreation()
         {
-            LinkCreationVisible?.Invoke(false);
+            LinkCreationVisible?.Invoke(false, null);
         }
 
         public event Action<Link> LinkCreated;
+        public event Action<Link> LinkUpdated;
         public void CreateLink(Link link)
         {
-            var createdLink = Context.Links.Add(link);
-            LinkCreated?.Invoke(createdLink.Entity);
+            if (link.Id is null)
+            {
+                // Create
+                var createdLink = Context.Links.Add(link);
+                LinkCreated?.Invoke(createdLink.Entity);
+            }
+            else
+            {
+                // Update
+                var entity = Context.Links.Find(link.Id);
+
+                if (entity is not null)
+                {
+                    entity.Title = link.Title;
+                    entity.URL = link.URL;
+                    entity.Description = link.Description;
+                    entity.CollectionId = link.CollectionId;
+
+                    var updatedLink = Context.Links.Update(entity);
+                    LinkUpdated?.Invoke(updatedLink.Entity);
+                }
+
+            }
             Context.SaveChanges();
         }
 
