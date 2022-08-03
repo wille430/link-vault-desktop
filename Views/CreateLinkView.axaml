@@ -18,39 +18,43 @@
             </ExperimentalAcrylicBorder.Material>
         </ExperimentalAcrylicBorder>
 
-        <Panel Margin="40">
-            <DockPanel IsVisible="{Binding IsVisible}">
-                <StackPanel DockPanel.Dock="Top">
-                    <TextBlock>Create Collection</TextBlock>
+        <DockPanel
+                IsVisible="{Binding IsVisible}"
+                Margin="40">
+            <StackPanel
+                    DockPanel.Dock="Top"
+                    Margin="0,0,0,16">
+                <TextBlock>Create Collection</TextBlock>
+            </StackPanel>
+            <StackPanel Spacing="8">
+                <TextBlock>Title</TextBlock>
+                <TextBox Text="{Binding Title}"></TextBox>
+
+                <TextBlock>URL</TextBlock>
+                <TextBox Text="{Binding URL}"></TextBox>
+
+                <TextBlock>Description</TextBlock>
+                <TextBox Text="{Binding Description}"></TextBox>
+
+                <TextBlock>Collection</TextBlock>
+                <ComboBox
+                        Items="{Binding LinkCollections}"
+                        SelectedItem="{Binding Collection}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}"></TextBlock>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+
+                <StackPanel
+                        Orientation="Horizontal"
+                        Spacing="8">
+                    <Button Command="{Binding CreateLinkCommand}">Add</Button>
+                    <Button Command="{Binding Cancel}">Cancel</Button>
                 </StackPanel>
-                <StackPanel>
-                    <TextBlock>Title</TextBlock>
-                    <TextBox Text="{Binding Title}"></TextBox>
-
-                    <TextBlock>URL</TextBlock>
-                    <TextBox Text="{Binding URL}"></TextBox>
-
-                    <TextBlock>Description</TextBlock>
-                    <TextBox Text="{Binding Description}"></TextBox>
-
-                    <TextBlock>Collection</TextBlock>
-                    <ComboBox
-                            Items="{Binding LinkCollections}"
-                            SelectedItem="{Binding Collection}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name}"></TextBlock>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-
-
-                    <StackPanel Orientation="Horizontal">
-                        <Button Command="{Binding CreateLinkCommand}">Add</Button>
-                        <Button Command="{Binding Cancel}">Cancel</Button>
-                    </StackPanel>
-                </StackPanel>
-            </DockPanel>
-        </Panel>
+            </StackPanel>
+        </DockPanel>
     </Panel>
 </UserControl>

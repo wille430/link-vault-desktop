@@ -40,5 +40,13 @@ namespace LinkVault.Stores
             LinkCreated?.Invoke(createdLink.Entity);
             Context.SaveChanges();
         }
+
+        public event Action<Link> LinkDeleted;
+        public void DeleteLink(Link link)
+        {
+            Context.Links.Remove(link);
+            LinkDeleted?.Invoke(link);
+            Context.SaveChanges();
+        }
     }
 }
