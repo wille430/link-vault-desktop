@@ -7,6 +7,7 @@ using LinkVault.Context;
 using LinkVault.Stores;
 using LinkVault.ViewModels;
 using LinkVault.Views;
+using LinkVault.Services;
 using ReactiveUI;
 using Splat;
 
@@ -14,6 +15,7 @@ namespace LinkVault
 {
     public static class Bootstrapper
     {
+
         public static void Register(IMutableDependencyResolver services)
         {
             services.RegisterLazySingleton<AppDbContext>(CreateWithConstructorInjection<AppDbContext>);
@@ -25,6 +27,10 @@ namespace LinkVault
             // Stores
             services.RegisterLazySingleton<CollectionStore>(() => new CollectionStore());
             services.RegisterLazySingleton<LinkStore>(() => new LinkStore());
+
+            // Services
+            services.RegisterLazySingleton<ServerService>(() => new ServerService());
+            services.RegisterLazySingleton<messageBusService>(() => new messageBusService());
         }
 
         public static T CreateWithConstructorInjection<T>() where T : class
