@@ -5,7 +5,7 @@ using Avalonia.Threading;
 
 namespace LinkVault.Services
 {
-    public class messageBusService
+    public class MessageBusService
     {
         Dictionary<string, List<Action<object>>> events = new Dictionary<string, List<Action<object>>>();
 

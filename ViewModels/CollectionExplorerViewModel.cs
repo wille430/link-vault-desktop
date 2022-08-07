@@ -7,6 +7,7 @@ using System;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using LinkVault.Stores;
+using LinkVault.Services;
 
 namespace LinkVault.ViewModels
 {
@@ -24,10 +25,13 @@ namespace LinkVault.ViewModels
 
         AppDbContext _context { get; }
 
+        MessageBusService MessageBusService { get; }
+
         public CollectionExplorerViewModel()
             : this(
                 Locator.Current.GetService<AppDbContext>()!,
-                Locator.Current.GetService<CollectionStore>()!
+                Locator.Current.GetService<CollectionStore>()!,
+                Locator.Current.GetService<MessageBusService>()!
             )
         {
             this.WhenAnyValue(x => x.SearchText).Subscribe(searchText =>
@@ -41,18 +45,43 @@ namespace LinkVault.ViewModels
             });
         }
 
-        public CollectionExplorerViewModel(AppDbContext context, CollectionStore collectionStore)
+        public CollectionExplorerViewModel(AppDbContext context, CollectionStore collectionStore, MessageBusService messageBusService)
         {
             _context = context;
             CollectionStore = collectionStore;
+            MessageBusService = messageBusService;
 
             CollectionStore.CollectionCreated += OnCollectionCreated;
+
+            // Register events
+            MessageBusService.RegisterEvents("CollectionCreated", OnCollectionCreated);
+            MessageBusService.RegisterEvents("CollectionUpdated", OnCollectionUpdated);
         }
 
-        private void OnCollectionCreated(LinkCollection obj)
+        private void OnCollectionUpdated(object obj)
         {
-            LinkCollections.Add(obj);
+            var collection = (LinkCollection)obj;
+
+            var originalCollection = LinkCollections.Where(col => col.Id == collection.Id).FirstOrDefault();
+
+            // Collection should already exist. But in case not, append it.
+            if (originalCollection is null)
+            {
+                LinkCollections.Add(collection);
+            }
+            else
+            {
+                var index = LinkCollections.IndexOf(originalCollection);
+                LinkCollections[index] = collection;
+            }
+
         }
+
+        private void OnCollectionCreated(object obj)
+        {
+            LinkCollections.Add((LinkCollection)obj);
+        }
+
 
         public void GetSearchResult()
         {

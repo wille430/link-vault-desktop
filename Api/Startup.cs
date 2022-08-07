@@ -1,6 +1,8 @@
 using LinkVault.Context;
+using LinkVault.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Splat;
 
 namespace LinkVault.Api
 {
@@ -11,7 +13,10 @@ namespace LinkVault.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSingleton<AppDbContext>();
+
+            services.AddSingleton<AppDbContext>(Locator.Current.GetService<AppDbContext>()!);
+            services.AddSingleton<MessageBusService>(Locator.Current.GetService<MessageBusService>()!);
+
             services.AddSwaggerGen();
 
             services.AddMvc(options =>

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using LinkVault.Api.Dtos;
 using LinkVault.Context;
 using LinkVault.Models;
+using LinkVault.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LinkVault.Api.Controllers
@@ -15,10 +16,12 @@ namespace LinkVault.Api.Controllers
     public class CollectionsController : ControllerBase
     {
         private AppDbContext Context { get; }
+        private MessageBusService MessageBusService { get; }
 
-        public CollectionsController(AppDbContext context)
+        public CollectionsController(AppDbContext context, MessageBusService messageBusService)
         {
             Context = context;
+            MessageBusService = messageBusService;
         }
 
         [HttpGet]
@@ -58,7 +61,7 @@ namespace LinkVault.Api.Controllers
 
             var collection = response.Entity;
 
-
+            MessageBusService.Emit("CollectionCreated", collection);
             return CreatedAtAction(nameof(GetByIdAsync), new { id = collection.Id }, collection);
 
         }
@@ -79,6 +82,7 @@ namespace LinkVault.Api.Controllers
 
             await Context.SaveChangesAsync();
 
+            MessageBusService.Emit("CollectionUpdated", collection);
             return CreatedAtAction(nameof(GetByIdAsync), new { id = collection.Id }, collection);
 
         }
@@ -94,6 +98,7 @@ namespace LinkVault.Api.Controllers
             Context.Collections.Remove(collection);
             await Context.SaveChangesAsync();
 
+            MessageBusService.Emit("CollectionRemoved", id);
             return Ok();
         }
     }

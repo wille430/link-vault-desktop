@@ -10,6 +10,7 @@ using LinkVault.Views;
 using LinkVault.Services;
 using ReactiveUI;
 using Splat;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace LinkVault
 {
@@ -30,7 +31,7 @@ namespace LinkVault
 
             // Services
             services.RegisterLazySingleton<ServerService>(() => new ServerService());
-            services.RegisterLazySingleton<messageBusService>(() => new messageBusService());
+            services.RegisterLazySingleton<MessageBusService>(() => new MessageBusService());
         }
 
         public static T CreateWithConstructorInjection<T>() where T : class
