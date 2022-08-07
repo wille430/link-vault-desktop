@@ -23,6 +23,16 @@ namespace LinkVault.Api
             {
                 options.SuppressAsyncSuffixInActionNames = false;
             });
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowChromeExtension", policy =>
+                {
+                    policy.AllowAnyOrigin();
+                    policy.AllowAnyMethod();
+                    policy.AllowAnyHeader();
+                });
+            });
         }
 
         public void Configure(IApplicationBuilder app)
@@ -34,6 +44,8 @@ namespace LinkVault.Api
 
             app.UseSwagger();
             app.UseSwaggerUI();
+
+            app.UseCors("AllowChromeExtension");
 
             app.UseEndpoints(endpoints =>
             {
