@@ -29,10 +29,11 @@ namespace LinkVault.Stores
         }
 
         public event Action<LinkCollection> CollectionCreated;
-        public void CreateCollection(LinkCollection linkCollection)
+        public async void CreateCollection(LinkCollection linkCollection)
         {
             CollectionCreated?.Invoke(linkCollection);
             Context.Collections.Add(linkCollection);
+            await Context.SaveChangesAsync();
         }
     }
 }

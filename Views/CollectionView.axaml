@@ -31,11 +31,14 @@
             <Button Command="{Binding AddLink}">+ Add link</Button>
         </StackPanel>
 
-        <Panel
+        <Border
                 Grid.Row="1"
                 IsVisible="{Binding !HasCollection}"
+                Padding="16"
                 VerticalAlignment="Center">
-            <TextBlock TextAlignment="Center">No collection selected. Please select a collection from the explorer view or create one.</TextBlock>
-        </Panel>
+            <TextBlock
+                    TextAlignment="Center"
+                    TextWrapping="1">No collection selected. Please select a collection from the explorer view or create one.</TextBlock>
+        </Border>
     </Grid>
 </UserControl>

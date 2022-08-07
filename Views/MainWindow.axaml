@@ -38,16 +38,19 @@
                         MaxWidth="600" />
             </Grid.ColumnDefinitions>
 
+
             <Grid
                     Grid.Column="0"
                     Grid.ColumnSpan="{Binding ColumnSpan}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="300" />
+                    <ColumnDefinition Width="1" />
                     <ColumnDefinition
                             Width="5*"
                             MinWidth="400" />
                     <ColumnDefinition Width="3*" />
                 </Grid.ColumnDefinitions>
+
 
                 <Border Grid.Column="0">
                     <ContentControl>
@@ -55,8 +58,13 @@
                     </ContentControl>
                 </Border>
 
-                <Border
+                <GridSplitter
                         Grid.Column="1"
+                        Background="Black"
+                        ResizeDirection="Columns" />
+
+                <Border
+                        Grid.Column="2"
                         Grid.ColumnSpan="2">
                     <ContentControl>
                         <vm:CollectionViewModel />
