@@ -1,7 +1,6 @@
 using LinkVault.Context;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Splat;
 
 namespace LinkVault.Api
 {
@@ -13,6 +12,12 @@ namespace LinkVault.Api
         {
             services.AddControllers();
             services.AddSingleton<AppDbContext>();
+            services.AddSwaggerGen();
+
+            services.AddMvc(options =>
+            {
+                options.SuppressAsyncSuffixInActionNames = false;
+            });
         }
 
         public void Configure(IApplicationBuilder app)
@@ -21,6 +26,9 @@ namespace LinkVault.Api
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();
+
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseEndpoints(endpoints =>
             {
