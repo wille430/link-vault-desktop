@@ -1,8 +1,9 @@
 using System;
+using LinkVault.Api.Dtos;
 
 namespace LinkVault.Models
 {
-    public class Link
+    public class Link : ModelBase<LinkDto>
     {
         public int? Id { get; set; }
         public string URL { get; set; }
@@ -17,6 +18,11 @@ namespace LinkVault.Models
         {
             this.CreatedAt = DateTime.Now;
             this.UpdatedAt = DateTime.Now;
+        }
+
+        public override LinkDto AsDto()
+        {
+            return new LinkDto(Id, Title, URL, Description, CollectionId, CreatedAt, UpdatedAt);
         }
     }
 }

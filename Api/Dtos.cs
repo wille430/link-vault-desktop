@@ -3,9 +3,18 @@ using System;
 
 namespace LinkVault.Api.Dtos
 {
-    public class GetColsDto
+
+    public interface IPagination
+    {
+        int Page { get; set; }
+        int Limit { get; set; }
+    }
+
+    public class GetColsDto : IPagination
     {
         public string? Keyword { get; set; }
+        public int Page { get; set; } = 1;
+        public int Limit { get; set; } = 20;
     }
 
     public class CreateColDto

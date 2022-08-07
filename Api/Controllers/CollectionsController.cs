@@ -34,9 +34,9 @@ namespace LinkVault.Api.Controllers
 
                 return col.Name.Contains(getColsDto.Keyword, StringComparison.InvariantCultureIgnoreCase);
             };
-            var collections = Context.Collections.Where(filterFunc).ToList().Select(x => x.AsDto());
+            var result = Context.Collections.GetPaged<LinkCollectionDto, LinkCollection>(filterFunc, getColsDto.Page, getColsDto.Limit);
 
-            return Ok(collections);
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
