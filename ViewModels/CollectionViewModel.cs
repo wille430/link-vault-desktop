@@ -7,6 +7,7 @@ using LinkVault.Stores;
 using ReactiveUI;
 using System.Collections.ObjectModel;
 using System.Linq;
+using LinkVault.Services;
 
 namespace LinkVault.ViewModels
 {
@@ -30,11 +31,14 @@ namespace LinkVault.ViewModels
 
         public LinkStore LinkStore;
 
+        MessageBusService MessageBusService { get; }
+
         public CollectionViewModel()
             : this(
                 Locator.Current.GetService<AppDbContext>()!,
                 Locator.Current.GetService<CollectionStore>()!,
-                Locator.Current.GetService<LinkStore>()!
+                Locator.Current.GetService<LinkStore>()!,
+                Locator.Current.GetService<MessageBusService>()!
             )
         {
             this.WhenAnyValue(x => x.LinkCollection).Subscribe(x =>
@@ -56,15 +60,30 @@ namespace LinkVault.ViewModels
             });
         }
 
-        public CollectionViewModel(AppDbContext context, CollectionStore collectionStore, LinkStore linkStore)
+        public CollectionViewModel(AppDbContext context, CollectionStore collectionStore, LinkStore linkStore, MessageBusService messageBusService)
         {
             Context = context;
             CollectionStore = collectionStore;
             LinkStore = linkStore;
+            MessageBusService = messageBusService;
 
             CollectionStore.CollectionSelected += OnCollectionSelected;
             LinkStore.LinkCreated += OnLinkCreated;
             LinkStore.LinkUpdated += OnLinkUpdated;
+
+            // Register events
+            MessageBusService.RegisterEvents("LinkCreated", OnLinkCreated);
+            MessageBusService.RegisterEvents("LinkUpdated", OnLinkUpdated);
+            MessageBusService.RegisterEvents("LinkDeleted", OnLinkDeleted);
+        }
+
+        private void OnLinkDeleted(object obj)
+        {
+            var id = (int)obj;
+            var link = Links.Where(link => link.Id == id).FirstOrDefault();
+
+            if (link is not null)
+                Links.Remove(link);
         }
 
         private void OnCollectionSelected(LinkCollection? linkCollection)
@@ -72,8 +91,9 @@ namespace LinkVault.ViewModels
             LinkCollection = linkCollection;
         }
 
-        private void OnLinkCreated(Link link)
+        private void OnLinkCreated(object obj)
         {
+            var link = (Link)obj;
             if (link.CollectionId == LinkCollection?.Id)
             {
                 LinkCollection?.Links.Add(link);
@@ -87,8 +107,9 @@ namespace LinkVault.ViewModels
             LinkStore.HideLinkCreation();
         }
 
-        private void OnLinkUpdated(Link link)
+        private void OnLinkUpdated(object obj)
         {
+            var link = (Link)obj;
             if (link.CollectionId == LinkCollection?.Id)
             {
                 var index = Links.ToList().FindIndex(0, Links.Count, x => x.Id == link.Id);
