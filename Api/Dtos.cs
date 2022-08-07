@@ -1,4 +1,6 @@
 
+using System;
+
 namespace LinkVault.Api.Dtos
 {
     public class GetColsDto
@@ -28,4 +30,19 @@ namespace LinkVault.Api.Dtos
     {
         public new int? CollectionId { get; set; }
     }
+
+    public record LinkDto(
+        int? Id,
+        string Title,
+        string URL,
+        string Description,
+        int? CollectionId,
+        DateTimeOffset CreatedAt,
+        DateTimeOffset UpdatedAt);
+
+    public record LinkCollectionDto(
+        int? Id,
+        string Name,
+        DateTimeOffset CreatedAt,
+        DateTimeOffset UpdatedAt);
 }

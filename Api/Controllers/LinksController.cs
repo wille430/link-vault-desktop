@@ -5,6 +5,7 @@ using LinkVault.Api.Dtos;
 using LinkVault.Context;
 using LinkVault.Models;
 using LinkVault.Services;
+using LinkVault.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LinkVault.Api.Controllers
@@ -34,7 +35,7 @@ namespace LinkVault.Api.Controllers
 
                 return link.CollectionId == getLinksDto.CollectionId;
             };
-            var links = Context.Links.Where(filterFunc).ToList();
+            var links = Context.Links.Where(filterFunc).ToList().Select(x => x.AsDto());
 
             return Ok(links);
         }
@@ -47,11 +48,11 @@ namespace LinkVault.Api.Controllers
             if (link is null)
                 return NotFound();
 
-            return Ok(link);
+            return Ok(link.AsDto());
         }
 
         [HttpPost]
-        public async Task<ActionResult<Link>> PostAsync(CreateLinkDto createLinkDto)
+        public async Task<ActionResult<LinkDto>> PostAsync(CreateLinkDto createLinkDto)
         {
             var link = new Link
             {
@@ -66,12 +67,12 @@ namespace LinkVault.Api.Controllers
             link = res.Entity;
 
             MessageBusService.Emit("LinkCreated", link);
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = link.Id }, link);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = link.Id }, link.AsDto());
         }
 
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Link>> PutAsync(int id, UpdateLinkDto updateLinkDto)
+        public async Task<ActionResult<LinkDto>> PutAsync(int id, UpdateLinkDto updateLinkDto)
         {
             var link = await Context.Links.FindAsync(id);
 
@@ -90,7 +91,7 @@ namespace LinkVault.Api.Controllers
             await Context.SaveChangesAsync();
 
             MessageBusService.Emit("LinkUpdated", link);
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = link.Id }, link);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = link.Id }, link.AsDto());
         }
 
         [HttpDelete("{id}")]

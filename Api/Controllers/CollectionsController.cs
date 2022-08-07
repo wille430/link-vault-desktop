@@ -34,7 +34,7 @@ namespace LinkVault.Api.Controllers
 
                 return col.Name.Contains(getColsDto.Keyword, StringComparison.InvariantCultureIgnoreCase);
             };
-            var collections = Context.Collections.Where(filterFunc).ToList();
+            var collections = Context.Collections.Where(filterFunc).ToList().Select(x => x.AsDto());
 
             return Ok(collections);
         }
@@ -47,7 +47,7 @@ namespace LinkVault.Api.Controllers
             if (collection is null)
                 return NotFound();
 
-            return Ok();
+            return Ok(collection.AsDto());
         }
 
         [HttpPost]
@@ -62,7 +62,7 @@ namespace LinkVault.Api.Controllers
             var collection = response.Entity;
 
             MessageBusService.Emit("CollectionCreated", collection);
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = collection.Id }, collection);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = collection.Id }, collection.AsDto());
 
         }
 
@@ -83,7 +83,7 @@ namespace LinkVault.Api.Controllers
             await Context.SaveChangesAsync();
 
             MessageBusService.Emit("CollectionUpdated", collection);
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = collection.Id }, collection);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = collection.Id }, collection.AsDto());
 
         }
 
