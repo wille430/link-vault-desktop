@@ -4,13 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using LinkVault.Context;
-using LinkVault.Stores;
 using LinkVault.ViewModels;
 using LinkVault.Views;
 using LinkVault.Services;
 using ReactiveUI;
 using Splat;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace LinkVault
 {
@@ -24,10 +22,6 @@ namespace LinkVault
             services.Register(() => new CollectionExplorerView(), typeof(IViewFor<CollectionExplorerViewModel>));
             services.Register(() => new CollectionView(), typeof(IViewFor<CollectionViewModel>));
             services.Register(() => new CreateCollectionWindow(), typeof(IViewFor<CreateCollectionViewModel>));
-
-            // Stores
-            services.RegisterLazySingleton<CollectionStore>(() => new CollectionStore());
-            services.RegisterLazySingleton<LinkStore>(() => new LinkStore());
 
             // Services
             services.RegisterLazySingleton<ServerService>(() => new ServerService());

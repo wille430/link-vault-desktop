@@ -1,7 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using LinkVault.Stores;
+using LinkVault.Services;
 using LinkVault.ViewModels;
 using LinkVault.Views;
 using Splat;
@@ -21,7 +21,7 @@ namespace LinkVault
             {
                 desktop.MainWindow = new MainWindow
                 {
-                    DataContext = new MainWindowViewModel(Locator.Current.GetService<CollectionStore>()!),
+                    DataContext = new MainWindowViewModel(Locator.Current.GetService<MessageBusService>()!),
                 };
             }
 

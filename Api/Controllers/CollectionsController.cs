@@ -98,7 +98,7 @@ namespace LinkVault.Api.Controllers
             Context.Collections.Remove(collection);
             await Context.SaveChangesAsync();
 
-            MessageBusService.Emit("CollectionRemoved", id);
+            MessageBusService.Emit("CollectionDeleted", collection);
             return Ok();
         }
     }

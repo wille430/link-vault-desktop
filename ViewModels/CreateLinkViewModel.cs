@@ -4,7 +4,8 @@ using System.Linq;
 using System.Reactive;
 using LinkVault.Context;
 using LinkVault.Models;
-using LinkVault.Stores;
+using LinkVault.Services;
+using LinkVault.Services.Dtos;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -30,18 +31,18 @@ namespace LinkVault.ViewModels
 
         public AppDbContext Context;
 
-        public LinkStore LinkStore;
-
         [Reactive]
         public string Heading { get; set; }
 
         [Reactive]
-        public Link SelectedLink { get; set; }
+        public Link? SelectedLink { get; set; }
+
+        MessageBusService MessageBusService { get; }
 
         public CreateLinkViewModel()
             : this(
                 Locator.Current.GetService<AppDbContext>()!,
-                Locator.Current.GetService<LinkStore>()!
+                Locator.Current.GetService<MessageBusService>()!
             )
         {
 
@@ -66,16 +67,16 @@ namespace LinkVault.ViewModels
                 CreatedAt = System.DateTime.Now,
             }, CreateEnabled);
 
-            Cancel = ReactiveCommand.Create(() => (Link)null!);
+            Cancel = ReactiveCommand.Create(() => (Link?)null);
 
             CreateLinkCommand.Subscribe(link =>
             {
-                LinkStore.CreateLink(link);
+                MessageBusService.Emit("LinkCreated", link);
             });
 
             Cancel.Subscribe(x =>
             {
-                LinkStore.HideLinkCreation();
+                MessageBusService.Emit("ShowLinkCreation", new ShowLinkCreationDto(false));
             });
 
             this.WhenAnyValue(x => x.SelectedLink).Subscribe(link =>
@@ -101,11 +102,10 @@ namespace LinkVault.ViewModels
             });
         }
 
-        public CreateLinkViewModel(AppDbContext context, LinkStore linkStore)
+        public CreateLinkViewModel(AppDbContext context, MessageBusService messageBusService)
         {
             Context = context;
-            LinkStore = linkStore;
-
+            MessageBusService = messageBusService;
         }
 
         public void LoadCollections()

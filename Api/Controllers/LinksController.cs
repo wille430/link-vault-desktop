@@ -5,7 +5,6 @@ using LinkVault.Api.Dtos;
 using LinkVault.Context;
 using LinkVault.Models;
 using LinkVault.Services;
-using LinkVault.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LinkVault.Api.Controllers

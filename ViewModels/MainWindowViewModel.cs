@@ -2,7 +2,8 @@
 using System.Reactive.Linq;
 using System.Windows.Input;
 using LinkVault.Models;
-using LinkVault.Stores;
+using LinkVault.Services;
+using LinkVault.Services.Dtos;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -15,20 +16,17 @@ namespace LinkVault.ViewModels
 
         public ICommand CreateCollection { get; }
 
-        public CollectionStore CollectionStore { get; }
-        public LinkStore LinkStore { get; }
-
         [Reactive]
         public CreateLinkViewModel? CreateLinkViewModel { get; set; }
 
         [Reactive]
         public int ColumnSpan { get; set; } = 1;
 
+        MessageBusService MessageBusService { get; }
 
-        public MainWindowViewModel(CollectionStore collectionStore)
-            : this(Locator.Current.GetService<LinkStore>()!)
+        public MainWindowViewModel(MessageBusService messageBusService)
         {
-            CollectionStore = collectionStore;
+            MessageBusService = messageBusService;
 
             ShowDialog = new Interaction<CreateCollectionViewModel, LinkCollection?>();
             CreateCollection = ReactiveCommand.CreateFromTask(async () =>
@@ -37,7 +35,7 @@ namespace LinkVault.ViewModels
                 var result = await ShowDialog.Handle(collectionCreation);
 
                 if (result != null)
-                    CollectionStore.CreateCollection(result);
+                    MessageBusService.Emit("CollectionCreated", result);
             });
 
             this.WhenAnyValue(x => x.CreateLinkViewModel).Subscribe(x =>
@@ -45,16 +43,13 @@ namespace LinkVault.ViewModels
                 this.ColumnSpan = x is null ? 2 : 1;
             });
 
+            MessageBusService.RegisterEvents("ShowLinkCreation", OnLinkCreationVisible);
+
         }
 
-        public MainWindowViewModel(LinkStore linkStore)
+        private void OnLinkCreationVisible(object obj)
         {
-            LinkStore = linkStore;
-            LinkStore.LinkCreationVisible += OnLinkCreationVisible;
-        }
-
-        private void OnLinkCreationVisible(bool isVisible, Link? link)
-        {
+            var (isVisible, link) = (ShowLinkCreationDto)obj;
             CreateLinkViewModel = isVisible ? new CreateLinkViewModel() : null;
 
             if (CreateLinkViewModel is not null)

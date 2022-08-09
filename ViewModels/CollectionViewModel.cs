@@ -3,11 +3,11 @@ using LinkVault.Context;
 using LinkVault.Models;
 using Splat;
 using ReactiveUI.Fody.Helpers;
-using LinkVault.Stores;
 using ReactiveUI;
 using System.Collections.ObjectModel;
 using System.Linq;
 using LinkVault.Services;
+using LinkVault.Services.Dtos;
 
 namespace LinkVault.ViewModels
 {
@@ -27,17 +27,11 @@ namespace LinkVault.ViewModels
         [Reactive]
         public Link? SelectedLink { get; set; }
 
-        public CollectionStore CollectionStore;
-
-        public LinkStore LinkStore;
-
         MessageBusService MessageBusService { get; }
 
         public CollectionViewModel()
             : this(
                 Locator.Current.GetService<AppDbContext>()!,
-                Locator.Current.GetService<CollectionStore>()!,
-                Locator.Current.GetService<LinkStore>()!,
                 Locator.Current.GetService<MessageBusService>()!
             )
         {
@@ -56,25 +50,21 @@ namespace LinkVault.ViewModels
 
             this.WhenAnyValue(x => x.SelectedLink).Subscribe(link =>
             {
-                LinkStore.ShowLinkCreation(link);
+                MessageBusService.Emit("LinkSelected", link);
             });
         }
 
-        public CollectionViewModel(AppDbContext context, CollectionStore collectionStore, LinkStore linkStore, MessageBusService messageBusService)
+        public CollectionViewModel(AppDbContext context, MessageBusService messageBusService)
         {
             Context = context;
-            CollectionStore = collectionStore;
-            LinkStore = linkStore;
             MessageBusService = messageBusService;
-
-            CollectionStore.CollectionSelected += OnCollectionSelected;
-            LinkStore.LinkCreated += OnLinkCreated;
-            LinkStore.LinkUpdated += OnLinkUpdated;
 
             // Register events
             MessageBusService.RegisterEvents("LinkCreated", OnLinkCreated);
             MessageBusService.RegisterEvents("LinkUpdated", OnLinkUpdated);
             MessageBusService.RegisterEvents("LinkDeleted", OnLinkDeleted);
+
+            MessageBusService.RegisterEvents("CollectionSelected", OnCollectionSelected);
         }
 
         private void OnLinkDeleted(object obj)
@@ -86,9 +76,9 @@ namespace LinkVault.ViewModels
                 Links.Remove(link);
         }
 
-        private void OnCollectionSelected(LinkCollection? linkCollection)
+        private void OnCollectionSelected(object? linkCollection)
         {
-            LinkCollection = linkCollection;
+            LinkCollection = (LinkCollection?)linkCollection;
         }
 
         private void OnLinkCreated(object obj)
@@ -104,7 +94,7 @@ namespace LinkVault.ViewModels
                 LinkCollection = link.Collection ?? Context.Collections.Find(link.CollectionId);
             }
 
-            LinkStore.HideLinkCreation();
+            MessageBusService.Emit("ShowLinkCreation", new ShowLinkCreationDto(false));
         }
 
         private void OnLinkUpdated(object obj)
@@ -131,12 +121,13 @@ namespace LinkVault.ViewModels
             {
                 LinkCollection = link.Collection ?? Context.Collections.Find(link.CollectionId);
             }
-            LinkStore.HideLinkCreation();
+
+            MessageBusService.Emit("ShowLinkCreation", new ShowLinkCreationDto(false));
         }
 
         private void AddLink()
         {
-            LinkStore.ShowLinkCreation();
+            MessageBusService.Emit("ShowLinkCreation", new ShowLinkCreationDto(true));
         }
     }
 }

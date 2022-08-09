@@ -6,7 +6,6 @@ using Splat;
 using System;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using LinkVault.Stores;
 using LinkVault.Services;
 
 namespace LinkVault.ViewModels
@@ -14,8 +13,6 @@ namespace LinkVault.ViewModels
     public class CollectionExplorerViewModel : ViewModelBase
     {
         public ObservableCollection<LinkCollection> LinkCollections { get; } = new();
-
-        public CollectionStore CollectionStore;
 
         [Reactive]
         public LinkCollection? SelectedCollection { get; set; }
@@ -30,7 +27,6 @@ namespace LinkVault.ViewModels
         public CollectionExplorerViewModel()
             : this(
                 Locator.Current.GetService<AppDbContext>()!,
-                Locator.Current.GetService<CollectionStore>()!,
                 Locator.Current.GetService<MessageBusService>()!
             )
         {
@@ -41,21 +37,19 @@ namespace LinkVault.ViewModels
 
             this.WhenAnyValue(x => x.SelectedCollection).Subscribe(selectedCollection =>
             {
-                CollectionStore.SelectCollection(selectedCollection);
+                MessageBusService.Emit("CollectionSelected", selectedCollection);
             });
         }
 
-        public CollectionExplorerViewModel(AppDbContext context, CollectionStore collectionStore, MessageBusService messageBusService)
+        public CollectionExplorerViewModel(AppDbContext context, MessageBusService messageBusService)
         {
             _context = context;
-            CollectionStore = collectionStore;
             MessageBusService = messageBusService;
-
-            CollectionStore.CollectionCreated += OnCollectionCreated;
 
             // Register events
             MessageBusService.RegisterEvents("CollectionCreated", OnCollectionCreated);
             MessageBusService.RegisterEvents("CollectionUpdated", OnCollectionUpdated);
+            MessageBusService.RegisterEvents("CollectionDeleted", OnCollectionDeleted);
         }
 
         private void OnCollectionUpdated(object obj)
@@ -80,6 +74,11 @@ namespace LinkVault.ViewModels
         private void OnCollectionCreated(object obj)
         {
             LinkCollections.Add((LinkCollection)obj);
+        }
+
+        private void OnCollectionDeleted(object obj)
+        {
+            LinkCollections.Remove((LinkCollection)obj);
         }
 
 
